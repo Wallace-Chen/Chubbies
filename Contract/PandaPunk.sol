@@ -1,27 +1,32 @@
-// contracts/Chubby.sol
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
-import "./token/ERC721/ERC721.sol";
+import "./token/ERC721/extensions/ERC721Enumerable.sol";
 import "./access/Ownable.sol";
+import "./utils/EnumerableSet.sol";
+import "./utils/math/SafeMath.sol"
 
-// Inspired/Copied fromm BGANPUNKS V2 (bastardganpunks.club)
-contract Chubbies is ERC721, Ownable {
+contract PandaPunk is ERC721Enumerable, Ownable {
     using SafeMath for uint256;
-    uint public constant MAX_CHUBBIES = 10000;
+	using EnumerableSet for EnumerableSet.UintSet;
+
+    uint public constant MAX_PANDAS = 10000;
     bool public hasSaleStarted = false;
+
+	uint256 private rand_seed;
+	EnumerableSet.UintSet private token_rep;
     
-    // The IPFS hash for all Chubbies concatenated *might* stored here once all Chubbies are issued and if I figure it out
-    string public METADATA_PROVENANCE_HASH = "";
-
     // Truth.　
-    string public constant R = "You can be chubby and still be cute. Cuteness is Justice.";
+    string public constant R = "Punk and Panda.";
 
-    constructor(string memory baseURI) ERC721("Chubbies","CHUBBIES")  {
+    constructor(string memory baseURI) ERC721("PandaPunk","PANDAPUNK")  {
         setBaseURI(baseURI);
+		rand_seed = 0;
+		// populate the token id repository
+		for (uint256 i=1; i<=MAX_PANDAS; i=i.add(1)){
+			token_rep.add(i);
+		}
     }
     
     function tokensOfOwner(address _owner) external view returns(uint256[] memory ) {
@@ -41,7 +46,7 @@ contract Chubbies is ERC721, Ownable {
     
     function calculatePrice() public view returns (uint256) {
         require(hasSaleStarted == true, "Sale hasn't started");
-        require(totalSupply() < MAX_CHUBBIES, "Sale has already ended");
+        require(totalSupply() < MAX_PANDAS, "Sale has already ended");
 
         uint currentSupply = totalSupply();
         if (currentSupply >= 9900) {
@@ -62,7 +67,7 @@ contract Chubbies is ERC721, Ownable {
     }
 
     function calculatePriceForToken(uint _id) public view returns (uint256) {
-        require(_id < MAX_CHUBBIES, "Sale has already ended");
+        require(_id < MAX_PANDAS, "Sale has already ended");
 
         if (_id >= 9900) {
             return 1000000000000000000;        // 9900-10000: 1.00 ETH
@@ -81,22 +86,26 @@ contract Chubbies is ERC721, Ownable {
         }
     }
     
-   function adoptChubby(uint256 numChubbies) public payable {
-        require(totalSupply() < MAX_CHUBBIES, "Sale has already ended");
-        require(numChubbies > 0 && numChubbies <= 20, "You can adopt minimum 1, maximum 20 chubbies");
-        require(totalSupply().add(numChubbies) <= MAX_CHUBBIES, "Exceeds MAX_CHUBBIES");
-        require(msg.value >= calculatePrice().mul(numChubbies), "Ether value sent is below the price");
+   function adoptPandaPunk(uint256 numPandas) public payable {
+        require(totalSupply() < MAX_PANDAS, "Sale has already ended");
+        require(numPandas > 0 && numPandas <= 20, "You can adopt minimum 1, maximum 20 chubbies");
+        require(totalSupply().add(numPandas) <= MAX_PANDAS, "Exceeds MAX_PANDAS");
+        require(msg.value >= calculatePrice().mul(numPandas), "Ether value sent is below the price");
 
-        for (uint i = 0; i < numChubbies; i++) {
-            uint mintIndex = totalSupply();
-            _safeMint(msg.sender, mintIndex);
+        for (uint i = 0; i < numPandas; i++) {
+			uint256 numLeft = token_rep.length();
+            uint256 index = _random(msg.sender) % numLeft;
+			uint256 tokenId = token_rep.at(index);
+			token_rep.remove(tokenId);
+            _safeMint(msg.sender, tokenId);
         }
     }
-    
-    // God Mode
-    function setProvenanceHash(string memory _hash) public onlyOwner {
-        METADATA_PROVENANCE_HASH = _hash;
-    }
+
+	function _random(Address from) private returns (uint256) {
+    	uint256 randomNumber = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), from, rand_seed)));
+    	rand_seed = randomNumber;
+    	return randomNumber;
+  	}
     
     function setBaseURI(string memory baseURI) public onlyOwner {
         _setBaseURI(baseURI);
@@ -113,13 +122,13 @@ contract Chubbies is ERC721, Ownable {
         require(payable(msg.sender).send(address(this).balance));
     }
 
-    function reserveGiveaway(uint256 numChubbies) public onlyOwner {
+    function reserveGiveaway(uint256 numPandas) public onlyOwner {
         uint currentSupply = totalSupply();
-        require(totalSupply().add(numChubbies) <= 30, "Exceeded giveaway supply");
+        require(totalSupply().add(numPandas) <= 30, "Exceeded giveaway supply");
         require(hasSaleStarted == false, "Sale has already started");
         uint256 index;
         // Reserved for people who helped this project and giveaways
-        for (index = 0; index < numChubbies; index++) {
+        for (index = 0; index < numPandas; index++) {
             _safeMint(owner(), currentSupply + index);
         }
     }

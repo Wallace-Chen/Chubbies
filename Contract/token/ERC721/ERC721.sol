@@ -25,6 +25,9 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     // Token symbol
     string private _symbol;
 
+	// Base URI
+	string private _baseURI;
+
     // Mapping from token ID to owner address
     mapping (uint256 => address) private _owners;
 
@@ -43,6 +46,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     constructor (string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
+		_baseURI = "";
     }
 
     /**
@@ -102,7 +106,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * in child contracts.
      */
     function _baseURI() internal view virtual returns (string memory) {
-        return "";
+        return _baseURI;
     }
 
     /**
@@ -314,6 +318,15 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         _owners[tokenId] = to;
 
         emit Transfer(from, to, tokenId);
+    }
+
+	 /**
+     * @dev Internal function to set the base URI for all token IDs. It is
+     * automatically added as a prefix to the value returned in {tokenURI},
+     * or to the token ID if {tokenURI} is empty.
+     */
+    function _setBaseURI(string memory baseURI_) internal virtual {
+        _baseURI = baseURI_;
     }
 
     /**
