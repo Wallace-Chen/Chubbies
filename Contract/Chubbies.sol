@@ -3,8 +3,10 @@
 
 pragma solidity ^0.7.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
+import "./token/ERC721/ERC721.sol";
+import "./access/Ownable.sol";
 
 // Inspired/Copied fromm BGANPUNKS V2 (bastardganpunks.club)
 contract Chubbies is ERC721, Ownable {
