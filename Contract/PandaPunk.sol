@@ -9,24 +9,24 @@ import "./utils/math/SafeMath.sol"
 
 contract PandaPunk is ERC721Enumerable, Ownable {
     using SafeMath for uint256;
-	using EnumerableSet for EnumerableSet.UintSet;
+    using EnumerableSet for EnumerableSet.UintSet;
 
     uint public constant MAX_PANDAS = 10000;
     bool public hasSaleStarted = false;
 
-	uint256 private rand_seed;
-	EnumerableSet.UintSet private token_rep;
+    uint256 private rand_seed;
+    EnumerableSet.UintSet private token_rep;
     
     // Truth.　
     string public constant R = "Punk and Panda.";
 
     constructor(string memory baseURI) ERC721("PandaPunk","PANDAPUNK")  {
         setBaseURI(baseURI);
-		rand_seed = 0;
-		// populate the token id repository
-		for (uint256 i=1; i<=MAX_PANDAS; i=i.add(1)){
-			token_rep.add(i);
-		}
+        rand_seed = 0;
+        // populate the token id repository
+        for (uint256 i=1; i<=MAX_PANDAS; i=i.add(1)){
+            token_rep.add(i);
+        }
     }
     
     function tokensOfOwner(address _owner) external view returns(uint256[] memory ) {
@@ -93,19 +93,19 @@ contract PandaPunk is ERC721Enumerable, Ownable {
         require(msg.value >= calculatePrice().mul(numPandas), "Ether value sent is below the price");
 
         for (uint i = 0; i < numPandas; i++) {
-			uint256 numLeft = token_rep.length();
+            uint256 numLeft = token_rep.length();
             uint256 index = _random(msg.sender) % numLeft;
-			uint256 tokenId = token_rep.at(index);
-			token_rep.remove(tokenId);
+            uint256 tokenId = token_rep.at(index);
+            token_rep.remove(tokenId);
             _safeMint(msg.sender, tokenId);
         }
     }
 
-	function _random(Address from) private returns (uint256) {
-    	uint256 randomNumber = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), from, rand_seed)));
-    	rand_seed = randomNumber;
-    	return randomNumber;
-  	}
+    function _random(Address from) private returns (uint256) {
+        uint256 randomNumber = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), from, rand_seed)));
+        rand_seed = randomNumber;
+        return randomNumber;
+   }
     
     function setBaseURI(string memory baseURI) public onlyOwner {
         _setBaseURI(baseURI);
