@@ -1,4 +1,6 @@
-*.swap/
+**/*.swap
+**/.DS_Store
+
 build/
 flattened/
 node_modules/
@@ -7,7 +9,6 @@ test/
 truffle-config.js/
 upload/
 
-.DS_Store
 .truffle-config.js
 package-lock.json
 truffle.js
