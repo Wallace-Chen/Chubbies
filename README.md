@@ -8,4 +8,7 @@ In addition, you need to have your metamask account with a few ethers (testnet o
 ### Run
 Configure truffle-config.js file first.
 Then do:
-```truffle deploy --network rinkeby```
+```
+// deplot it to the rinkeby testnet
+truffle deploy --network rinkeby
+```
