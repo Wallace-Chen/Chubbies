@@ -23,7 +23,7 @@ contract PandaPunk is ERC721Enumerable, Ownable {
     constructor() ERC721("PandaPunk","PANDAPUNK")  {
         setBaseURI("");
         rand_seed = 0;
-         populate the token id repository
+        //populate the token id repository
         for (uint256 i=1; i<=MAX_PANDAS; i=i.add(1)){
             token_rep.add(i);
         }
@@ -37,7 +37,7 @@ contract PandaPunk is ERC721Enumerable, Ownable {
         } else {
             uint256[] memory result = new uint256[](tokenCount);
             uint256 index;
-            for (index = 0; index < tokenCount; index++) {
+            for (index = 0; index < tokenCount; index=index.add(1)) {
                 result[index] = tokenOfOwnerByIndex(_owner, index);
             }
             return result;
@@ -78,15 +78,21 @@ contract PandaPunk is ERC721Enumerable, Ownable {
         require(totalSupply().add(numPandas) <= MAX_PANDAS, "Exceeds MAX_PANDAS");
         require(msg.value >= calculatePrice().mul(numPandas), "Ether value sent is below the price");
 
-        for (uint i = 0; i < numPandas; i++) {
-            uint256 numLeft = token_rep.length();
-			require(numLeft>0, "Error: no token left!");
-            uint256 index = _random(msg.sender) % numLeft;
-            uint256 tokenId = token_rep.at(index);
-            token_rep.remove(tokenId);
+        for (uint i = 0; i < numPandas; i=i.add(1)) {
+            uint256 tokenId = _getTokenId(msg.sender);
             _safeMint(msg.sender, tokenId);
         }
     }
+
+    function _getTokenId(address from) private returns (uint256){
+        uint256 numLeft = token_rep.length();
+        require(numLeft>0, "Error: no token left!");
+        uint256 index = _random(from) % numLeft;
+        uint256 tokenId = token_rep.at(index);
+        token_rep.remove(tokenId);
+        return tokenId;
+    }
+
 
     function _random(address from) private returns (uint256) {
         uint256 randomNumber = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), from, rand_seed)));
@@ -110,13 +116,14 @@ contract PandaPunk is ERC721Enumerable, Ownable {
     }
 
     function reserveGiveaway(uint256 numPandas) public onlyOwner {
-        uint currentSupply = totalSupply();
-        require(totalSupply().add(numPandas) <= 30, "Exceeded giveaway supply");
+        uint256 currentSupply = totalSupply();
+        require(currentSupply.add(numPandas) <= 5, "Exceeded giveaway supply");
+        require(currentSupply.add(numPandas) <= MAX_PANDAS, "Exceeds MAX_PANDAS");
         require(hasSaleStarted == false, "Sale has already started");
-        uint256 index;
         // Reserved for people who helped this project and giveaways
-        for (index = 0; index < numPandas; index++) {
-            _safeMint(owner(), currentSupply + index);
+        for (uint256  index = 0; index < numPandas; index=index.add(1)) {
+            uint256 tokenId = _getTokenId(owner());
+            _safeMint(owner(), tokenId);
         }
     }
 }

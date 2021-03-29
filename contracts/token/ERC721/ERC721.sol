@@ -260,6 +260,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     function _mint(address to, uint256 tokenId) internal virtual {
         require(to != address(0), "ERC721: mint to the zero address");
         require(!_exists(tokenId), "ERC721: token already minted");
+        require(_balances[to]<_balances[to]+1, "ERC721: overflow error, cannot have more tokens!");
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -307,6 +308,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     function _transfer(address from, address to, uint256 tokenId) internal virtual {
         require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
         require(to != address(0), "ERC721: transfer to the zero address");
+        require(_balances[to]<_balances[to]+1, "ERC721: overflow error, cannot have more tokens!");
 
         _beforeTokenTransfer(from, to, tokenId);
 

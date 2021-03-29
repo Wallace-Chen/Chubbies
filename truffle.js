@@ -23,7 +23,7 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-var mnemonic = "";
+var mnemonic = ""; 
 
 module.exports = {
   /**
@@ -106,7 +106,7 @@ module.exports = {
     'truffle-plugin-verify'
   ],
   api_keys: {
-    etherscan: ''
+    etherscan: 'DSQFRTSAHJNG9X9437HRFCVVUXPBZQJ6CY'
   },
 
   // Truffle DB is currently disabled by default; to enable it, change enabled: false to enabled: true

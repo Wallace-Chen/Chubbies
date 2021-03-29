@@ -9,6 +9,5 @@ test/
 truffle-config.js/
 upload/
 
-.truffle-config.js
+truffle-config.js
 package-lock.json
-truffle.js
