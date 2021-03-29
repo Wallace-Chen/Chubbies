@@ -1,1 +1,9 @@
 *.swap
+./build
+./flattened
+./node_modules
+./package-lock.json
+./test
+.truffle-config.js
+./upload
+./contracts/node_modules
